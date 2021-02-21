@@ -14,9 +14,7 @@
   ],
   "author": "Josep del Rio",
   "license": "MIT",
-  "bin": {
-    "zzfx-minifier": "bin/zzfx-minifier"
-  },
+  "bin": "./index.js",
   "bugs": {
     "url": "https://github.com/joseprio/zzfx-minifier/issues"
   },
