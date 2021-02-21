@@ -3,7 +3,6 @@
 import yargs from "yargs";
 import { readFileSync, writeFileSync } from "fs";
 import ejs from "ejs";
-import path from "path";
 
 const options = yargs(process.argv.slice(2))
   .usage("Usage: -i <input> -o <output>")
@@ -178,7 +177,7 @@ const exports = inputKeys
   .join("\n\n");
 
 const template = readFileSync(
-  path.resolve(__dirname, "./template/ZzFXMicro.js.template")
+  new URL("./template/ZzFXMicro.js.template", import.meta.url)
 );
 const result = ejs.render(template.toString(), {
   constants,
