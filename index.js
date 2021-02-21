@@ -3,6 +3,7 @@
 import yargs from "yargs";
 import { readFileSync, writeFileSync } from "fs";
 import ejs from "ejs";
+import path from "path";
 
 const options = yargs(process.argv.slice(2))
   .usage("Usage: -i <input> -o <output>")
@@ -123,8 +124,6 @@ const constants = bestDefaultValues
   )
   .join("\n");
 
-console.log(constants);
-
 // Parameters
 // ----------
 // The parameter handler of the zzfx function; we will smartly not define a
@@ -178,10 +177,9 @@ const exports = inputKeys
   })
   .join("\n\n");
 
-console.log(exports);
-
-const template = readFileSync("./template/ZzFXMicro.js.template");
-
+const template = readFileSync(
+  path.resolve(__dirname, "./template/ZzFXMicro.js.template")
+);
 const result = ejs.render(template.toString(), {
   constants,
   parameters,
