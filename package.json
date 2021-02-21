@@ -1,6 +1,6 @@
 {
   "name": "zzfx-minifier",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Node command line to generate an optimized sound module from a JSON file, based on ZzFX",
   "type": "module",
   "main": "index.js",
