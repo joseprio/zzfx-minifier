@@ -1,0 +1,25 @@
+{
+  "name": "zzfx-minifier",
+  "version": "0.0.1",
+  "description": "Node command line to generate an optimized sound module from a JSON file, based on ZzFX",
+  "type": "module",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joseprio/starshipwright.git"
+  },
+  "keywords": [
+    "sound",
+    "zzfx"
+  ],
+  "author": "Josep del Rio",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/joseprio/zzfx-minifier/issues"
+  },
+  "homepage": "https://github.com/joseprio/zzfx-minifier#readme",
+  "dependencies": {
+    "ejs": "^3.1.6",
+    "yargs": "^16.2.0"
+  }
+}
