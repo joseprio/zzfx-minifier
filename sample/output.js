@@ -28,7 +28,7 @@ const zzfxR = 44100; // sample rate
 const zzfxV = 0.3; // volume
 const zzfx = ( // play sound
   // parameters
-  volume, frequency, sustain, release, sustainVolume, shape = 4, shapeCurve = 0.1, slide = 0, noise = 0, bitCrush = 0, delay = 0, decay = 0.04, attack = 0, modulation = 0, tremolo = 0, deltaSlide = 0, repeatTime = 0, pitchJump = 0, pitchJumpTime = 0
+  volume, frequency, sustain, release, sustainVolume, shape = 4, slide = 0, tremolo = 0, attack = 0, delay = 0, deltaSlide = 0, shapeCurve = 0.1, bitCrush = 0, modulation = 0, noise = 0, decay = 0.04, repeatTime = 0, pitchJumpTime = 0, pitchJump = 0
 ) => {
   const randomness = 0.05;
   // init parameters
@@ -140,57 +140,64 @@ const zzfx = ( // play sound
 };
 
 export function bullet() {
+  // // Removed 10 arguments at the end
   zzfx(
     ...[
-        0.04, 292, 0.01, 0.08, 0.74, 3, , -3.9, , , , , 0.02, , 0.43
+        0.04, 292, 0.01, 0.08, 0.74, 3, -3.9, 0.43, 0.02
     ]
   );
 }
 
 export function enemyHit() {
+  // // Removed 3 arguments at the end
   zzfx(
     ...[
-        0.1, 467, 0.06, 0.14, 0.58, , , , 0.5, 0.4, , 0.02, , 303, 0.02
+        0.1, 467, 0.06, 0.14, 0.58, , , 0.02, , , , , 0.4, 303, 0.5, 0.02
     ]
   );
 }
 
 export function explosion(volume) {
+  // // Removed 2 arguments at the end
   zzfx(
     ...[
-        volume, 274, 0.03, 0.67, 0.63, , 1.11, , 0.8, 0.5, 0.25, 0.02, , , , , 0.04
+        volume, 274, 0.03, 0.67, 0.63, , , , , 0.25, , 1.11, 0.5, , 0.8, 0.02, 0.04
     ]
   );
 }
 
 export function shieldHit() {
+  // // Removed 3 arguments at the end
   zzfx(
     ...[
-        0.9, 119, 0, 0.44, 0.85, 0, 0.09, 5.3, 0.7, 0.1, 0.01, 0.08, , -340, , -4.2
+        0.9, 119, 0, 0.44, 0.85, 0, 5.3, , , 0.01, -4.2, 0.09, 0.1, -340, 0.7, 0.08
     ]
   );
 }
 
 export function shieldPowerup() {
+  // // Removed 0 arguments at the end
   zzfx(
     ...[
-        0.5, 505, 0.12, 0.46, 0.69, 2, 1.67, , , , , 0.03, 0.21, , , , 0.28, 58, 0.02
+        0.5, 505, 0.12, 0.46, 0.69, 2, , , 0.21, , , 1.67, , , , 0.03, 0.28, 0.02, 58
     ]
   );
 }
 
 export function bossExplosion() {
+  // // Removed 4 arguments at the end
   zzfx(
     ...[
-        1.1, 369, 0.1, 1, 0.77, 2, 0.05, 0.4, 0.7, 0.8, 0.37, , , -1.3
+        1.1, 369, 0.1, 1, 0.77, 2, 0.4, , , 0.37, , 0.05, 0.8, -1.3, 0.7
     ]
   );
 }
 
 export function enemyFire() {
+  // // Removed 7 arguments at the end
   zzfx(
     ...[
-        0.3, 279, 0.09, 0.09, 0.89, 3, 1.2, -4.9, , , 0.05, , 0.02, , 0.02, -0.6
+        0.3, 279, 0.09, 0.09, 0.89, 3, -4.9, 0.02, 0.02, 0.05, -0.6, 1.2
     ]
   );
 }

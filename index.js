@@ -42,6 +42,10 @@ const zzfxDefaults = {
   tremolo: 0,
 };
 const zzfxDefaultsKeys = Object.keys(zzfxDefaults);
+const zzfxKeyToCol = {};
+zzfxDefaultsKeys.forEach((key, index) => {
+  zzfxKeyToCol[key] = index;
+});
 
 const inputData = JSON.parse(readFileSync(options.input));
 const inputKeys = Object.keys(inputData);
@@ -64,14 +68,16 @@ inputKeys.forEach((key) => {
   }
 });
 
-const bestDefaultValues = [];
+const bestDefaultValues = {};
 
 zzfxDefaultsKeys.forEach((key, keyIndex) => {
   const foundValues = new Map();
   let maxTotal = -1;
   let maxTotalValue = null;
 
+  let colDefaults = [];
   for (let c = 0; c < inputKeys.length; c++) {
+    colDefaults.push(inputData[inputKeys[c]][keyIndex]);
     const value = inputData[inputKeys[c]][keyIndex];
     if (typeof value === "string") {
       // Parametrized call, don't process the default
@@ -92,21 +98,81 @@ zzfxDefaultsKeys.forEach((key, keyIndex) => {
     }
   }
 
-  bestDefaultValues.push({
+  bestDefaultValues[key] = {
     key,
     total: maxTotal,
     value: maxTotalValue,
-  });
+  };
 });
 
-bestDefaultValues.sort((a, b) => a.total - b.total);
+const computeBestColsCache = {};
+function computeBestCols(unprocessedInputKeys, unprocessedCols) {
+  // We've processed all columns
+  if (unprocessedCols.size < 1) {
+    return { savings: 0, orderedCols: [] };
+  }
 
-const bestDefaultValuesMap = new Map(
-  bestDefaultValues.map((bestDefaultValue) => [
-    bestDefaultValue.key,
-    bestDefaultValue,
-  ])
-);
+  if (unprocessedInputKeys.size < 1) {
+    return {
+      savings: 0,
+      orderedCols: Array.from(unprocessedCols),
+    };
+  }
+
+  // Check cache
+  const cacheKey =
+    JSON.stringify(Array.from(unprocessedInputKeys)) +
+    JSON.stringify(Array.from(unprocessedCols));
+  if (computeBestColsCache[cacheKey]) {
+    return computeBestColsCache[cacheKey];
+  }
+
+  let bestData = null;
+  unprocessedCols.forEach((colKey) => {
+    const colDefault = bestDefaultValues[colKey].value;
+    const newUnprocessedInputKeysArray = Array.from(
+      unprocessedInputKeys
+    ).filter(
+      (inputKey) => inputData[inputKey][zzfxKeyToCol[colKey]] === colDefault
+    );
+    const newUnprocessedInputKeysSet = new Set(newUnprocessedInputKeysArray);
+    const newUnprocessedCols = new Set(unprocessedCols);
+    newUnprocessedCols.delete(colKey);
+    const currentColSavings = newUnprocessedInputKeysArray.length;
+    const currentData = computeBestCols(
+      newUnprocessedInputKeysSet,
+      newUnprocessedCols
+    );
+    const totalSavings = currentColSavings + currentData.savings;
+    if (bestData == null || totalSavings > bestData.savings) {
+      bestData = {
+        savings: totalSavings,
+        orderedCols: [...currentData.orderedCols, colKey],
+      };
+    }
+  });
+  computeBestColsCache[cacheKey] = bestData;
+  return bestData;
+}
+
+const solidInitialColumns = Object.keys(zzfxDefaults).filter((col) => {
+  if (bestDefaultValues[col].total === 1) {
+    return true;
+  }
+  return false;
+});
+const targetCols = Object.keys(zzfxDefaults).filter((col) => {
+  if (bestDefaultValues[col].total === 1) {
+    return false;
+  }
+  if (bestDefaultValues[col].total === inputKeys.length) {
+    return false;
+  }
+  return true;
+});
+
+const bestData = computeBestCols(new Set(inputKeys), new Set(targetCols));
+const exportColumnOrder = [...solidInitialColumns, ...bestData.orderedCols];
 
 // Compute constants, parameters and exports
 
@@ -116,11 +182,9 @@ const bestDefaultValuesMap = new Map(
 // may hopefully inline it
 // We know the it applies to all entries if the total is the same as the number
 // of entries
-const constants = bestDefaultValues
-  .filter((value) => value.total === inputKeys.length)
-  .map(
-    (constantValue) => `const ${constantValue.key} = ${constantValue.value};`
-  )
+const constants = Object.entries(bestDefaultValues)
+  .filter(([key, value]) => value.total === inputKeys.length)
+  .map(([key, value]) => `const ${key} = ${value.value};`)
   .join("\n");
 
 // Parameters
@@ -130,14 +194,11 @@ const constants = bestDefaultValues
 // equal to 1. We also filter the ones we processed as constants in the
 // previous step
 
-const parameters = bestDefaultValues
-  .filter((value) => value.total !== inputKeys.length)
-  .map(
-    (paramValue) =>
-      `${paramValue.key}${
-        paramValue.total === 1 ? "" : " = " + paramValue.value
-      }`
-  )
+const parameters = exportColumnOrder
+  .map((col) => {
+    const { total, value } = bestDefaultValues[col];
+    return `${col}${total === 1 ? "" : " = " + value}`;
+  })
   .join(", ");
 
 // Exports
@@ -154,19 +215,21 @@ const exports = inputKeys
       inputData[key].map((col, colIndex) => [zzfxDefaultsKeys[colIndex], col])
     );
 
-    const parameters = bestDefaultValues
-      .filter((value) => value.total !== inputKeys.length)
-      .map((paramValue) => {
-        const inputParameter = inputParameterMap.get(paramValue.key);
-        return paramValue.total > 1 && inputParameter === paramValue.value
-          ? ""
-          : inputParameter;
-      });
+    const parameters = exportColumnOrder.map((col) => {
+      const inputParameter = inputParameterMap.get(col);
+      const defaultValue = bestDefaultValues[col];
+      return defaultValue.total > 1 && inputParameter === defaultValue.value
+        ? ""
+        : inputParameter;
+    });
+    let saved = 0;
     while (parameters.length > 0 && parameters[parameters.length - 1] === "") {
+      saved++;
       parameters.pop();
     }
 
     return `export function ${key}(${inputArguments.join(", ")}) {
+  // // Removed ${saved} arguments at the end
   zzfx(
     ...[
         ${parameters.join(", ")}
