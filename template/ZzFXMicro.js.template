@@ -28,7 +28,9 @@ const zzfxR = 44100; // sample rate
 const zzfxV = 0.3; // volume
 const zzfx = ( // play sound
   // parameters
+  [
   <%= parameters %>
+  ]
 ) => {
   <%= constants %>
   // init parameters

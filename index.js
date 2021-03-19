@@ -231,7 +231,7 @@ const exports = inputKeys
     return `export function ${key}(${inputArguments.join(", ")}) {
   // // Removed ${saved} arguments at the end
   zzfx(
-    ...[
+    [
         ${parameters.join(", ")}
     ]
   );
