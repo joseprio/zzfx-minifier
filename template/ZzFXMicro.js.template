@@ -23,7 +23,7 @@
 // @language_out ECMASCRIPT_2019
 // ==/ClosureCompiler==
 
-const zzfxX = new (window.AudioContext || webkitAudioContext)(); // audio context
+const zzfxX = new (self.AudioContext || webkitAudioContext)(); // audio context
 const zzfxR = 44100; // sample rate
 const zzfxV = 0.3; // volume
 const zzfx = ( // play sound
