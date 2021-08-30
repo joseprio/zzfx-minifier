@@ -23,7 +23,7 @@
 // @language_out ECMASCRIPT_2019
 // ==/ClosureCompiler==
 
-let zzfxX;
+const zzfxX = new (window.AudioContext || webkitAudioContext)(); // audio context;
 const zzfxR = 44100; // sample rate
 const zzfxV = 0.3; // volume
 const zzfx = ( // play sound
@@ -140,9 +140,5 @@ const zzfx = ( // play sound
   source.start();
   return source;
 };
-
-export function initAudio() {
-  zzfxX = new (window.AudioContext || webkitAudioContext)(); // audio context
-}
 
 <%= exports %>

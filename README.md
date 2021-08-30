@@ -11,11 +11,3 @@ will be a JS ES module that exports the sounds as functions.
 ```
 node index.js -i <input> -o <output>
 ```
-
-A difference form the original ZzFX is that the audio needs to be initialized; this cannot be done on initialization as
-some browsers will prevent it.
-```
-import {initAudio} from 'generatedSounds';
-...
-initAudio();
-```
